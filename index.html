@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ion Exchange Drug Delivery — Advances in Controlled and Novel Drug Delivery</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16303C; --ink2:#25495A; --paper:#F4EFE3; --card:#FDFAF2;
+  --accent:#C75B2A; --teal:#2C6E63; --teal-l:#7FB5AA; --gold:#D9A441;
+  --line:rgba(22,48,60,.16); --body:#2A4550;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:#0E2129;font-family:'Archivo',sans-serif;color:var(--ink);overflow:hidden}
+
+#progress{position:fixed;top:0;left:0;right:0;height:4px;background:rgba(244,239,227,.12);z-index:50}
+#bar{height:100%;width:7%;background:var(--gold);transition:width .35s ease}
+
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#stage{width:1280px;height:720px;position:relative;transform-origin:center center}
+
+.slide{position:absolute;inset:0;background:var(--paper);padding:50px 62px 46px;display:none;flex-direction:column;overflow:hidden}
+.slide::before{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(22,48,60,.06) 1px,transparent 1px);background-size:24px 24px;pointer-events:none}
+.slide.active{display:flex}
+.slide>*{position:relative;z-index:1}
+
+/* ---------- header & typography ---------- */
+.kicker{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--teal);font-weight:500}
+.pageno{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink2);opacity:.65;letter-spacing:.1em}
+h2.title{font-family:'Fraunces',serif;font-weight:600;font-size:38px;line-height:1.06;margin:8px 0 10px;color:var(--ink)}
+.rule{height:3px;width:78px;background:var(--accent);margin-bottom:20px;position:relative;flex:none}
+.rule::after{content:'';position:absolute;left:88px;top:1px;height:1px;width:240px;background:var(--line)}
+
+.card{background:var(--card);border:1.5px solid var(--ink);border-radius:14px;padding:20px 22px;box-shadow:4px 4px 0 rgba(22,48,60,.07)}
+.card h3{font-family:'Fraunces',serif;font-size:19px;font-weight:600;margin-bottom:10px;color:var(--ink)}
+.card h3 .tag{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:.1em;margin-right:8px}
+
+ul.b{list-style:none}
+ul.b li{position:relative;padding-left:19px;margin-bottom:9px;font-size:15px;line-height:1.45;color:var(--body)}
+ul.b li:last-child{margin-bottom:0}
+ul.b li::before{content:'';position:absolute;left:0;top:8px;width:7px;height:7px;border-radius:2px;background:var(--accent)}
+ul.b.teal li::before{background:var(--teal)}
+ul.b li b{color:var(--ink);font-weight:600}
+
+.eq{font-family:'IBM Plex Mono',monospace;background:#fff;border:1.5px dashed var(--ink2);border-radius:10px;padding:11px 14px;font-size:14.5px;text-align:center;color:var(--ink);line-height:1.7}
+.eq .hl{color:var(--accent);font-weight:600}
+
+.note{background:rgba(44,110,99,.08);border-left:4px solid var(--teal);border-radius:0 10px 10px 0;padding:12px 16px;font-size:13.5px;line-height:1.45;color:var(--ink2)}
+.note b{color:var(--ink)}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px}
+
+.foot{margin-top:auto;padding-top:12px;border-top:1px solid var(--line);display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink2);opacity:.7}
+
+table.tb{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--card);border-radius:12px;overflow:hidden;box-shadow:4px 4px 0 rgba(22,48,60,.07);border:1.5px solid var(--ink)}
+table.tb th{background:var(--ink);color:var(--paper);font-weight:600;text-align:left;padding:10px 14px;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase}
+table.tb td{border-bottom:1px solid var(--line);padding:10px 14px;vertical-align:top;line-height:1.4;color:var(--body)}
+table.tb tr:last-child td{border-bottom:none}
+table.tb td:first-child{font-weight:600;color:var(--ink)}
+table.tb td .mono{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--teal);font-weight:600}
+
+/* flow arrows */
+.flow{display:flex;align-items:stretch;gap:10px}
+.farr{display:flex;align-items:center;justify-content:center;font-size:30px;color:var(--accent);font-weight:700;flex:none}
+
+/* animation */
+.active .rev{animation:rise .6s cubic-bezier(.2,.7,.3,1) both}
+.active .d1{animation-delay:.05s}.active .d2{animation-delay:.15s}.active .d3{animation-delay:.25s}
+.active .d4{animation-delay:.35s}.active .d5{animation-delay:.45s}.active .d6{animation-delay:.55s}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+/* ---------- cover ---------- */
+.slide.cover{background:var(--ink);color:var(--paper)}
+.slide.cover::before{background-image:radial-gradient(rgba(244,239,227,.07) 1px,transparent 1px)}
+.cover-wrap{display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center;flex:1}
+.cover .kicker{color:var(--teal-l)}
+.cover h1{font-family:'Fraunces',serif;font-weight:600;font-size:62px;line-height:1.02;margin:18px 0 14px}
+.cover h1 em{font-style:italic;color:var(--gold)}
+.cover .sub{font-size:18px;line-height:1.5;color:rgba(244,239,227,.85);max-width:560px}
+.cover .src{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.1em;color:var(--teal-l);margin-top:22px}
+.stats{display:flex;gap:16px;margin-top:34px}
+.stat{flex:1;border-top:2px solid var(--gold);padding-top:10px}
+.stat .n{font-family:'Fraunces',serif;font-size:22px;font-weight:600;color:var(--paper)}
+.stat .l{font-size:12px;line-height:1.4;color:rgba(244,239,227,.7);margin-top:4px}
+.cover .foot{border-top:1px solid rgba(244,239,227,.2);color:rgba(244,239,227,.65)}
+.svgcap{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;color:var(--teal-l);text-align:center;margin-top:8px}
+
+/* nav */
+#nav{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:14px;z-index:60}
+#nav button{font-family:'IBM Plex Mono',monospace;font-size:15px;width:42px;height:38px;border-radius:9px;border:1.5px solid rgba(244,239,227,.4);background:rgba(14,33,41,.8);color:#F4EFE3;cursor:pointer;transition:all .2s}
+#nav button:hover{background:var(--accent);border-color:var(--accent)}
+#ctr{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#F4EFE3;letter-spacing:.14em}
+
+.pill{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--ink);color:var(--paper);border-radius:999px;padding:5px 12px;letter-spacing:.08em;margin-bottom:10px}
+.pill.alt{background:var(--teal)}
+</style>
+</head>
+<body>
+<div id="progress"><div id="bar"></div></div>
+<div id="viewport"><div id="stage">
+
+<!-- ================= SLIDE 1 : COVER ================= -->
+<section class="slide cover active">
+  <div class="cover-wrap">
+    <div>
+      <div class="kicker rev d1">Reference Book · Advances in Controlled and Novel Drug Delivery</div>
+      <h1 class="rev d2">Ion Exchange<br><em>Drug Delivery</em></h1>
+      <p class="sub rev d3">Resinates, release chemistry, and regulated therapeutic systems — how electrostatic binding turns an old separation technology into a modern controlled-release platform.</p>
+      <div class="src rev d4">N. K. JAIN (Ed.) · CBS PUBLISHERS &amp; DISTRIBUTORS, NEW DELHI</div>
+      <div class="stats rev d5">
+        <div class="stat"><div class="n">1950s</div><div class="l">First pharma uses: taste masking &amp; sustained release</div></div>
+        <div class="stat"><div class="n">D⁺ ⇌ Na⁺</div><div class="l">Release driven by counterion exchange, not diffusion alone</div></div>
+        <div class="stat"><div class="n">4</div><div class="l">Marketed resin platforms reviewed (polacrilex, polistirex…)</div></div>
+      </div>
+    </div>
+    <div class="rev d3">
+      <svg viewBox="0 0 460 430" width="100%">
+        <defs>
+          <marker id="ah" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+            <path d="M0,0 L8,4.5 L0,9 z" fill="#D9A441"/>
+          </marker>
+        </defs>
+        <circle cx="190" cy="218" r="142" fill="none" stroke="#F4EFE3" stroke-width="2.5"/>
+        <circle cx="190" cy="218" r="96" fill="none" stroke="rgba(244,239,227,.4)" stroke-width="1.5" stroke-dasharray="6 7"/>
+        <line x1="190" y1="76" x2="190" y2="360" stroke="rgba(244,239,227,.18)" stroke-width="1"/>
+        <line x1="48" y1="218" x2="332" y2="218" stroke="rgba(244,239,227,.18)" stroke-width="1"/>
+        <line x1="90" y1="118" x2="290" y2="318" stroke="rgba(244,239,227,.18)" stroke-width="1"/>
+        <line x1="290" y1="118" x2="90" y2="318" stroke="rgba(244,239,227,.18)" stroke-width="1"/>
+        <text x="190" y="130" fill="#7FB5AA" font-size="16" font-family="IBM Plex Mono" text-anchor="middle">−</text>
+        <text x="190" y="318" fill="#7FB5AA" font-size="16" font-family="IBM Plex Mono" text-anchor="middle">−</text>
+        <text x="106" y="224" fill="#7FB5AA" font-size="16" font-family="IBM Plex Mono" text-anchor="middle">−</text>
+        <text x="274" y="224" fill="#7FB5AA" font-size="16" font-family="IBM Plex Mono" text-anchor="middle">−</text>
+        <text x="132" y="174" fill="#7FB5AA" font-size="16" font-family="IBM Plex Mono" text-anchor="middle">−</text>
+        <text x="248" y="270" fill="#7FB5AA" font-size="16" font-family="IBM Plex Mono" text-anchor="middle">−</text>
+        <text x="248" y="174" fill="#D9A441" font-size="16" font-family="IBM Plex Mono" text-anchor="middle">+</text>
+        <text x="132" y="270" fill="#D9A441" font-size="16" font-family="IBM Plex Mono" text-anchor="middle">+</text>
+        <text x="190" y="226" fill="#D9A441" font-size="16" font-family="IBM Plex Mono" text-anchor="middle">+</text>
+        <line x1="308" y1="132" x2="392" y2="88" stroke="#D9A441" stroke-width="2.5" marker-end="url(#ah)"/>
+        <text x="398" y="82" fill="#F4EFE3" font-size="12.5" font-family="IBM Plex Mono">D⁺ released</text>
+        <line x1="388" y1="335" x2="300" y2="295" stroke="#7FB5AA" stroke-width="2.5" marker-end="url(#ah)"/>
+        <text x="330" y="362" fill="#F4EFE3" font-size="12.5" font-family="IBM Plex Mono">Na⁺ / H⁺ enters</text>
+        <text x="190" y="404" fill="rgba(244,239,227,.7)" font-size="11.5" font-family="IBM Plex Mono" text-anchor="middle">polymer resin bead · fixed − sites · exchangeable + ions</text>
+      </svg>
+    </div>
+  </div>
+  <div class="foot"><span>Ion Exchange Drug Delivery</span><span>01 / 14</span></div>
+</section>
+
+<!-- ================= SLIDE 2 : OUTLINE ================= -->
+<section class="slide">
+  <div><span class="kicker">Overview</span><span class="pageno" style="float:right">02 / 14</span></div>
+  <h2 class="title">What This Presentation Covers</h2>
+  <div class="rule"></div>
+  <div class="grid3" style="flex:1;align-content:start">
+    <div class="card rev d1"><span class="tag">01</span><h3>Foundations</h3><ul class="b teal"><li>What ion exchange is</li><li>Why pharma adopted it</li><li>The resinate concept</li></ul></div>
+    <div class="card rev d2"><span class="tag">02</span><h3>Chemistry of Exchange</h3><ul class="b teal"><li>Loading &amp; release equilibria</li><li>Resin classification</li><li>Selectivity &amp; driving forces</li></ul></div>
+    <div class="card rev d3"><span class="tag">03</span><h3>Making Resinates</h3><ul class="b teal"><li>Batch vs column loading</li><li>Purification &amp; finishing</li><li>Characterization</li></ul></div>
+    <div class="card rev d4"><span class="tag">04</span><h3>Release In Vivo</h3><ul class="b teal"><li>Gastrointestinal mechanism</li><li>Resin, drug &amp; medium factors</li><li>Rate modulation tools</li></ul></div>
+    <div class="card rev d5"><span class="tag">05</span><h3>Applications</h3><ul class="b teal"><li>Taste masking &amp; ER liquids</li><li>Gums, therapeutic resins</li><li>Marketed products</li></ul></div>
+    <div class="card rev d6"><span class="tag">06</span><h3>Evaluation &amp; Outlook</h3><ul class="b teal"><li>Advantages vs limitations</li><li>Coated &amp; hybrid systems</li><li>Key takeaways</li></ul></div>
+  </div>
+  <div class="foot"><span>Ion Exchange Drug Delivery</span><span>Outline</span></div>
+</section>
+
+<!-- ================= SLIDE 3 : CONCEPT ================= -->
+<section class="slide">
+  <div><span class="kicker">Section 01 · Foundations</span><span class="pageno" style="float:right">03 / 14</span></div>
+  <h2 class="title">What Is Ion Exchange Drug Delivery?</h2>
+  <div class="rule"></div>
+  <div class="grid2" style="flex:1;align-content:start">
+    <div class="card rev d1">
+      <span class="tag">A</span><h3>Definition</h3>
+      <ul class="b">
+        <li><b>Ion exchange</b> — the reversible interchange of ions between an insoluble polymeric resin and the surrounding liquid, with no change in the resin's structure.</li>
+        <li>In drug delivery, an <b>ionized drug</b> is electrostatically complexed with an <b>oppositely charged functional group</b> fixed on the resin.</li>
+        <li>The resulting complex — a <b>resinate</b> — releases drug only when suitable counterions appear in body fluids.</li>
+      </ul>
+    </div>
+    <div class="card rev d2">
+      <span class="tag">B</span><h3>Why Pharma Adopted It</h3>
+      <ul class="b">
+        <li>Sustained release achieved by <b>chemical binding</b> — no membrane or matrix required.</li>
+        <li>The resin's fixed charges stay permanently; <b>only the drug ion leaves</b>.</li>
+        <li>Release is governed by the <b>pH and ionic strength</b> of the medium.</li>
+        <li>Pharmaceutical use since the <b>1950s</b>, beginning with taste masking (Borodkin &amp; Sundberg).</li>
+      </ul>
+    </div>
+  </div>
+  <div class="note rev d3" style="margin-top:18px">
+    <b>Key distinction:</b> in matrix or membrane systems, release is dissolution/diffusion-controlled; in ion-exchange systems it is <b>stoichiometrically controlled by counterion supply</b> — a fundamentally different release logic.
+  </div>
+  <div class="foot"><span>Ion Exchange Drug Delivery</span><span>Foundations</span></div>
+</section>
+
+<!-- ================= SLIDE 4 : CHEMISTRY ================= -->
+<section class="slide">
+  <div><span class="kicker">Section 02 · Chemistry of Exchange</span><span class="pageno" style="float:right">04 / 14</span></div>
+  <h2 class="title">Loading &amp; Release Equilibria</h2>
+  <div class="rule"></div>
+  <div class="grid2" style="flex:1;align-content:start">
+    <div class="card rev d1">
+      <span class="tag">A</span><h3>Cation-Exchange Resin + Basic Drug</h3>
+      <div class="eq" style="margin-bottom:12px">R–SO₃⁻·Na⁺ + D⁺Cl⁻<br>⇌ R–SO₃⁻·<span class="hl">D⁺</span> + Na⁺Cl⁻</div>
+      <ul class="b">
+        <li>Fixed anionic sites (–SO₃⁻, –COO⁻) capture protonated basic drugs (D⁺).</li>
+        <li>Release in vivo: <b>H⁺</b> in gastric fluid, <b>Na⁺/K⁺</b> in intestinal fluid displace the drug.</li>
+      </ul>
+    </div>
+    <div class="card rev d2">
+      <span class="tag">B</span><h3>Anion-Exchange Resin + Acidic Drug</h3>
+      <div class="eq" style="margin-bottom:12px">R–N⁺(CH₃)₃·Cl⁻ + D⁻Na⁺<br>⇌ R–N⁺(CH₃)₃·<span class="hl">D⁻</span> + Na⁺Cl⁻</div>
+      <ul class="b">
+        <li>Fixed cationic sites (quaternary / tertiary amines) capture deprotonated acidic drugs (D⁻).</li>
+        <li>Release driven by <b>Cl⁻ and other anions</b> present in gastrointestinal secretions.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="note rev d3" style="margin-top:18px">
+    <b>Driving forces:</b> ① the resin's affinity (selectivity) for the drug ion, and ② the high counterion concentration of the release medium — equilibrium shifts follow Le Chatelier's principle. Electroneutrality is preserved at every step.
+  </div>
+  <div class="foot"><span>Ion Exchange Drug Delivery</span><span>Chemistry</span></div>
+</section>
+
+<!-- ================= SLIDE 5 : RESIN CLASSIFICATION ================= -->
+<section class="slide">
+  <div><span class="kicker">Section 02 · Chemistry of Exchange</span><span class="pageno" style="float:right">05 / 14</span></div>
+  <h2 class="title">Pharmaceutical Ion-Exchange Resins</h2>
+  <div class="rule"></div>
+  <div class="rev d1">
+    <table class="tb">
+      <tr><th style="width:22%">Resin class</th><th style="width:15%">Fixed group</th><th style="width:33%">Typical polymer / example</th><th>Best suited for</th></tr>
+      <tr>
+        <td>Strong-acid cation exchanger</td>
+        <td><span class="mono">–SO₃⁻</span></td>
+        <td>Sulfonated polystyrene–DVB<br><span class="mono">polistirex</span></td>
+        <td>Cationic (basic) drugs; robust sustained release across the GI pH range</td>
+      </tr>
+      <tr>
+        <td>Weak-acid cation exchanger</td>
+        <td><span class="mono">–COO⁻</span></td>
+        <td>Methacrylic acid–DVB<br><span class="mono">polacrilex</span></td>
+        <td>Weakly basic drugs; taste masking &amp; pH-sensitive release</td>
+      </tr>
+      <tr>
+        <td>Strong-base anion exchanger</td>
+        <td><span class="mono">–N⁺R₃</span></td>
+        <td>Quaternary-ammonium polystyrene<br><span class="mono">e.g., cholestyramine</span></td>
+        <td>Anionic (acidic) drugs; bile-acid sequestrant action</td>
+      </tr>
+      <tr>
+        <td>Weak-base anion exchanger</td>
+        <td><span class="mono">–NR₂ (protonated)</span></td>
+        <td>Amine-functionalized polystyrene resins</td>
+        <td>Acidic drugs; release responsive to pH &amp; electrolyte content</td>
+      </tr>
+    </table>
+  </div>
+  <div class="grid2" style="margin-top:18px">
+    <div class="note rev d2"><b>DVB</b> (divinylbenzene) is the crosslinker: higher crosslink density → tighter matrix → slower exchange and lower loading.</div>
+    <div class="note rev d3"><b>USP resin names:</b> polacrilex (weak-acid, methacrylic acid–DVB) and polistirex (strong-acid, sulfonated polystyrene) denote the cation exchangers used in marketed products.</div>
+  </div>
+  <div class="foot"><span>Ion Exchange Drug Delivery</span><span>Resins</span></div>
+</section>
+
+<!-- ================= SLIDE 6 : RESINATES ================= -->
+<section class="slide">
+  <div><span class="kicker">Section 03 · Making Resinates</span><span class="pageno" style="float:right">06 / 14</span></div>
+  <h2 class="title">The Drug–Resin Complex (Resinate)</h2>
+  <div class="rule"></div>
+  <div class="grid2" style="flex:1;align-content:start">
+    <div class="card rev d1">
+      <span class="tag">A</span><h3>Nature of the Complex</h3>
+      <ul class="b">
+        <li>Drug is held as <b>ion pairs</b> within the polymer bead — <b>no covalent bonds</b>; pharmacological activity is retained.</li>
+        <li>Drug is molecularly dispersed, frequently in an <b>amorphous or crystalline micro-deposit</b> state within the bead.</li>
+        <li>Free dissolved drug in saliva or gut fluid remains <b>low until exchange occurs</b> — the basis of taste masking.</li>
+      </ul>
+    </div>
+    <div class="card rev d2">
+      <span class="tag">B</span><h3>Preparation Methods</h3>
+      <ul class="b">
+        <li><b>Batch method:</b> drug solution slurried with resin to equilibrium; simple and scalable, but some drug stays unbound.</li>
+        <li><b>Column method:</b> drug solution recirculated through a packed resin bed; near-complete loading with minimal drug loss.</li>
+        <li>Followed by <b>washing, drying, size classification</b>; loading confirmed by assay.</li>
+        <li>Solvent "finishing" treatments can tune internal drug state and release rate (Borodkin).</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card rev d3" style="margin-top:18px">
+    <span class="tag">C</span><h3 style="margin-bottom:8px">Characterization of a Resinate</h3>
+    <ul class="b teal" style="columns:2;column-gap:28px">
+      <li>Drug-loading assay (meq/g &amp; % w/w)</li>
+      <li>In-vitro release profile (USP apparatuses)</li>
+      <li>Particle-size distribution</li>
+      <li>DSC / XRD — physical state of bound drug</li>
+    </ul>
+  </div>
+  <div class="foot"><span>Ion Exchange Drug Delivery</span><span>Resinates</span></div>
+</section>
+
+<!-- ================= SLIDE 7 : MECHANISM ================= -->
+<section class="slide">
+  <div><span class="kicker">Section 04 · Release In Vivo</span><span class="pageno" style="float:right">07 / 14</span></div>
+  <h2 class="title">Mechanism of Release in the GI Tract</h2>
+  <div class="rule"></div>
+  <div class="flow rev d1" style="margin-bottom:18px">
+    <div class="card" style="flex:1">
+      <span class="pill">1 · DOSE</span>
+      <h3 style="margin-bottom:6px">Resinate Bead</h3>
+      <div class="eq" style="font-size:13px">R⁻·D⁺</div>
+      <ul class="b" style="margin-top:10px"><li style="font-size:13.5px">Drug electrostatically bound to fixed resin sites</li></ul>
+    </div>
+    <div class="farr">⟶</div>
+    <div class="card" style="flex:1">
+      <span class="pill">2 · STOMACH · pH 1–3</span>
+      <h3 style="margin-bottom:6px">H⁺ Competition</h3>
+      <div class="eq" style="font-size:13px">R⁻·D⁺ + H⁺ ⇌ R⁻·H⁺ + D⁺</div>
+      <ul class="b" style="margin-top:10px"><li style="font-size:13.5px">Abundant H⁺ competes for fixed sites → partial, gradual release</li></ul>
+    </div>
+    <div class="farr">⟶</div>
+    <div class="card" style="flex:1">
+      <span class="pill alt">3 · INTESTINE · pH 6–8</span>
+      <h3 style="margin-bottom:6px">Sustained Displacement</h3>
+      <div class="eq" style="font-size:13px">R⁻·D⁺ + Na⁺/K⁺ ⇌ R⁻·Na⁺ + D⁺</div>
+      <ul class="b" style="margin-top:10px"><li style="font-size:13.5px">Na⁺, K⁺ &amp; higher ionic strength drive continuous exchange → free D⁺ available for absorption</li></ul>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="note rev d3"><b>No dose dumping by rupture:</b> release requires stoichiometric ion exchange — a safety advantage over purely membrane-controlled systems.</div>
+    <div class="note rev d4"><b>Rate relationships:</b> rate rises with counterion concentration; it falls with larger bead size and higher crosslink density (longer diffusion path).</div>
+  </div>
+  <div class="foot"><span>Ion Exchange Drug Delivery</span><span>Mechanism</span></div>
+</section>
+
+<!-- ================= SLIDE 8 : FACTORS ================= -->
+<section class="slide">
+  <div><span class="kicker">Section 04 · Release In Vivo</span><span class="pageno" style="float:right">08 / 14</span></div>
+  <h2 class="title">Factors Governing Drug Release</h2>
+  <div class="rule"></div>
+  <div class="grid2" style="flex:1;align-content:start">
+    <div class="card rev d1">
+      <span class="tag">A</span><h3>Resin Factors</h3>
+      <ul class="b">
+        <li><b>Particle size:</b> smaller beads → shorter diffusion path → faster exchange.</li>
+        <li><b>Crosslink density (DVB %):</b> tighter network → slower release, lower capacity.</li>
+        <li><b>Functional group strength</b> (–SO₃⁻ vs –COO⁻) sets pH sensitivity.</li>
+        <li><b>Exchange capacity</b> (meq/g) limits total drug load.</li>
+      </ul>
+    </div>
+    <div class="card rev d2">
+      <span class="tag">B</span><h3>Drug Factors</h3>
+      <ul class="b">
+        <li><b>pKa &amp; charge density:</b> determine ionization and resin affinity (selectivity).</li>
+        <li><b>Molecular size</b> relative to matrix pore size.</li>
+        <li><b>Dose:</b> high-dose drugs exceed practical loading capacity.</li>
+      </ul>
+    </div>
+    <div class="card rev d3">
+      <span class="tag">C</span><h3>Medium Factors</h3>
+      <ul class="b">
+        <li><b>pH</b> of GI fluids controls ionization of drug and weak resins.</li>
+        <li><b>Ionic strength</b> — counterion concentration is the release trigger.</li>
+        <li>Ions from <b>food and co-administered salts</b> accelerate exchange.</li>
+      </ul>
+    </div>
+    <div class="card rev d4">
+      <span class="tag">D</span><h3>Formulation Tools</h3>
+      <ul class="b">
+        <li><b>Film coating of resinates</b> delays ion ingress → extended or biphasic profiles.</li>
+        <li><b>Blending resins</b> of different particle sizes / crosslinking tunes kinetics.</li>
+        <li><b>Resin : drug ratio</b> sets loading and release duration.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>Ion Exchange Drug Delivery</span><span>Factors</span></div>
+</section>
+
+<!-- ================= SLIDE 9 : APPLICATIONS I ================= -->
+<section class="slide">
+  <div><span class="kicker">Section 05 · Applications</span><span class="pageno" style="float:right">09 / 14</span></div>
+  <h2 class="title">Applications I — Taste Masking &amp; ER Liquids</h2>
+  <div class="rule"></div>
+  <div class="grid2" style="flex:1;align-content:start">
+    <div class="card rev d1">
+      <span class="tag">A</span><h3>Taste Masking</h3>
+      <ul class="b">
+        <li>Bitterness requires <b>free dissolved drug</b> interacting with taste receptors.</li>
+        <li>In the resinate, drug is bound — <b>saliva's low ionic strength triggers little exchange</b> during the brief oral residence.</li>
+        <li>Foundation of <b>nicotine polacrilex gum</b> and numerous pediatric formulations.</li>
+        <li>No need for sweetener/coating overload to hide taste.</li>
+      </ul>
+    </div>
+    <div class="card rev d2">
+      <span class="tag">B</span><h3>Sustained-Release Liquids</h3>
+      <ul class="b">
+        <li>Resinate <b>suspensions</b> deliver extended release in a spoonable liquid — ideal for <b>pediatric and geriatric</b> patients.</li>
+        <li>Resinate beads suspend uniformly — <b>no dose non-uniformity</b> from settled granules.</li>
+        <li>Clinical examples: <b>12-hour antitussive suspensions</b> based on polistirex complexes (dextromethorphan; hydrocodone + chlorpheniramine).</li>
+      </ul>
+    </div>
+  </div>
+  <div class="note rev d3" style="margin-top:18px">
+    <b>Design principle:</b> select resin and optional coating so that release in the mouth ≈ 0, while release in gastric/intestinal electrolyte matches the target therapeutic profile.
+  </div>
+  <div class="foot"><span>Ion Exchange Drug Delivery</span><span>Applications</span></div>
+</section>
+
+<!-- ================= SLIDE 10 : APPLICATIONS II ================= -->
+<section class="slide">
+  <div><span class="kicker">Section 05 · Applications</span><span class="pageno" style="float:right">10 / 14</span></div>
+  <h2 class="title">Applications II — Beyond Oral Liquids</h2>
+  <div class="rule"></div>
+  <div class="grid3" style="flex:1;align-content:start">
+    <div class="card rev d1">
+      <span class="tag">A</span><h3>Chewable &amp; Gum Systems</h3>
+      <ul class="b">
+        <li>Mastication plus saliva electrolytes progressively displace drug.</li>
+        <li><b>Nicotine polacrilex gum</b> — controlled buccal nicotine delivery with acceptable taste.</li>
+        <li>Chewable resinate tablets for pediatric compliance.</li>
+      </ul>
+    </div>
+    <div class="card rev d2">
+      <span class="tag">B</span><h3>Resin as the Active Drug</h3>
+      <ul class="b">
+        <li><b>Sodium polystyrene sulfonate</b> exchanges Na⁺ for K⁺ in hyperkalemia.</li>
+        <li><b>Cholestyramine</b> (anion exchanger) sequesters bile acids to lower cholesterol.</li>
+        <li>Demonstrates the <b>biocompatibility and safety record</b> of pharmaceutical resins.</li>
+      </ul>
+    </div>
+    <div class="card rev d3">
+      <span class="tag">C</span><h3>Stabilization &amp; Handling</h3>
+      <ul class="b">
+        <li>Binding reduces drug <b>volatility and hygroscopicity</b> (e.g., nicotine).</li>
+        <li>Resinates show improved <b>flow and compressibility</b> for direct compression.</li>
+        <li>Research-stage: ion-exchange carriers explored for <b>nasal and other mucosal routes</b>.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="note rev d4" style="margin-top:18px">
+    <b>Common thread:</b> in every application, the resin is an inert, insoluble excipient — it traverses the GI tract unchanged and is eliminated, while only the exchanged drug ion is absorbed.
+  </div>
+  <div class="foot"><span>Ion Exchange Drug Delivery</span><span>Applications</span></div>
+</section>
+
+<!-- ================= SLIDE 11 : MARKETED EXAMPLES ================= -->
+<section class="slide">
+  <div><span class="kicker">Section 05 · Applications</span><span class="pageno" style="float:right">11 / 14</span></div>
+  <h2 class="title">Marketed Ion-Exchange Products</h2>
+  <div class="rule"></div>
+  <div class="rev d1">
+    <table class="tb">
+      <tr><th style="width:16%">Product</th><th style="width:31%">Active–resin complex</th><th style="width:22%">Dosage form</th><th>Design rationale</th></tr>
+      <tr>
+        <td>Nicorette</td>
+        <td>Nicotine <span class="mono">polacrilex</span> (weak-acid carboxylate resin)</td>
+        <td>Chewing gum</td>
+        <td>Taste masking + gradual release during chewing</td>
+      </tr>
+      <tr>
+        <td>Delsym</td>
+        <td>Dextromethorphan <span class="mono">polistirex</span> (strong-acid sulfonate resin)</td>
+        <td>ER oral suspension</td>
+        <td>12-hour antitussive action; pediatric-friendly liquid</td>
+      </tr>
+      <tr>
+        <td>Tussionex</td>
+        <td>Hydrocodone + chlorpheniramine <span class="mono">polistirex</span></td>
+        <td>ER suspension</td>
+        <td>12-hour cough/allergy relief; blunted early-release peaks</td>
+      </tr>
+      <tr>
+        <td>Ionamin</td>
+        <td>Phentermine–cation exchange resin</td>
+        <td>Capsule</td>
+        <td>Sustained anorectic release from a resinate dosage form</td>
+      </tr>
+    </table>
+  </div>
+  <div class="note rev d2" style="margin-top:16px">
+    <b>Resin identity:</b> polacrilex = methacrylic acid–DVB weak-acid cation exchanger; polistirex = sulfonated polystyrene strong-acid cation exchanger. Product descriptions per official FDA labeling (DailyMed / fda.gov).
+  </div>
+  <div class="foot"><span>Ion Exchange Drug Delivery</span><span>Products</span></div>
+</section>
+
+<!-- ================= SLIDE 12 : ADVANTAGES / LIMITATIONS ================= -->
+<section class="slide">
+  <div><span class="kicker">Section 06 · Evaluation</span><span class="pageno" style="float:right">12 / 14</span></div>
+  <h2 class="title">Advantages &amp; Limitations</h2>
+  <div class="rule"></div>
+  <div class="grid2" style="flex:1;align-content:start">
+    <div class="card rev d1" style="border-top:4px solid var(--teal)">
+      <span class="tag" style="color:var(--teal)">＋</span><h3>Advantages</h3>
+      <ul class="b teal">
+        <li><b>Chemical sustained release</b> — no coating or membrane required.</li>
+        <li><b>Inherent dose-dumping resistance:</b> release demands ion exchange, not rupture.</li>
+        <li>Excellent <b>taste masking</b> for bitter ionizable drugs.</li>
+        <li>Extended release available as <b>stable, uniform liquids</b>.</li>
+        <li>Pharmaceutical-grade resins with a <b>long safety record</b>; inert and insoluble.</li>
+        <li><b>Tunable kinetics</b> via particle size, crosslinking, blending, coating.</li>
+      </ul>
+    </div>
+    <div class="card rev d2" style="border-top:4px solid var(--accent)">
+      <span class="tag">－</span><h3>Limitations</h3>
+      <ul class="b">
+        <li>Only <b>ionizable drugs</b> with suitable pKa qualify.</li>
+        <li><b>Low loading capacity</b> — high-dose drugs become impractical.</li>
+        <li>Release varies with <b>GI pH and ion content</b> (food effects) → patient variability.</li>
+        <li>Potential <b>incomplete release</b> before the resin is eliminated.</li>
+        <li><b>Leachables / residual monomers</b> must be tightly controlled.</li>
+        <li>More complex <b>regulatory characterization</b> of the drug–resin complex.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>Ion Exchange Drug Delivery</span><span>Evaluation</span></div>
+</section>
+
+<!-- ================= SLIDE 13 : ADVANCES ================= -->
+<section class="slide">
+  <div><span class="kicker">Section 06 · Outlook</span><span class="pageno" style="float:right">13 / 14</span></div>
+  <h2 class="title">Recent Advances &amp; Future Directions</h2>
+  <div class="rule"></div>
+  <div class="grid2" style="flex:1;align-content:start">
+    <div class="card rev d1">
+      <span class="tag">A</span><h3>Coated Resinates</h3>
+      <ul class="b">
+        <li><b>Film coating of resinate beads</b> (fluid-bed processing) delays counterion ingress.</li>
+        <li>Blending coated + uncoated beads yields <b>programmable biphasic profiles</b> (immediate dose + extended maintenance).</li>
+      </ul>
+    </div>
+    <div class="card rev d2">
+      <span class="tag">B</span><h3>Miniaturized Carriers</h3>
+      <ul class="b">
+        <li><b>Micronized and nano-resinates</b> accelerate exchange for fast-dissolving and orally disintegrating formats.</li>
+        <li>Fine-particle resinates for <b>pediatric sprinkle</b> formulations.</li>
+      </ul>
+    </div>
+    <div class="card rev d3">
+      <span class="tag">C</span><h3>Hybrid Platforms</h3>
+      <ul class="b">
+        <li>Resins combined with <b>matrices, beads, and osmotic elements</b> to merge exchange control with diffusion control.</li>
+        <li>Research-stage <b>ion-exchange fibers and membranes</b> for transdermal and implantable routes.</li>
+      </ul>
+    </div>
+    <div class="card rev d4">
+      <span class="tag">D</span><h3>Gastroretention &amp; Deterrence</h3>
+      <ul class="b">
+        <li><b>Floating / gastroretentive resinate systems</b> studied to prolong upper-GI residence for site-specific release.</li>
+        <li>Slow-exchange resinate matrices contribute to <b>abuse-deterrent</b> design — rapid extraction is inherently difficult.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>Ion Exchange Drug Delivery</span><span>Outlook</span></div>
+</section>
+
+<!-- ================= SLIDE 14 : SUMMARY + REFERENCES ================= -->
+<section class="slide">
+  <div><span class="kicker">Section 06 · Conclusion</span><span class="pageno" style="float:right">14 / 14</span></div>
+  <h2 class="title">Summary &amp; References</h2>
+  <div class="rule"></div>
+  <div class="grid2" style="flex:1;align-content:start">
+    <div class="card rev d1">
+      <span class="tag">✓</span><h3>Key Takeaways</h3>
+      <ul class="b">
+        <li>Ion exchange converts release control from <b>dissusion-limited to chemically stoichiometric</b> — driven by counterion supply.</li>
+        <li>Resinates deliver <b>taste masking, liquid extended release, and dose-dumping resistance</b> from a single platform.</li>
+        <li>Release is governed by <b>resin</b> (size, crosslinking, group), <b>drug</b> (pKa, affinity), and <b>medium</b> (pH, ionic strength).</li>
+        <li>Market-proven: <b>polacrilex gums, polistirex ER suspensions, resin capsules</b>.</li>
+        <li>Coated and hybrid systems keep extending the concept to <b>new routes and profiles</b>.</li>
+      </ul>
+    </div>
+    <div class="card rev d2">
+      <span class="tag">§</span><h3>References</h3>
+      <ul class="b teal" style="font-size:13px">
+        <li>Jain NK (ed.). <i>Advances in Controlled and Novel Drug Delivery</i> — chapter on ion exchange drug delivery. New Delhi: CBS Publishers &amp; Distributors; 2001.</li>
+        <li>Anand V, Kandarapu R, Garg S. Ion-exchange resins: carrying drug delivery forward. <i>Drug Discovery Today</i>. 2001;6(17):905–914.</li>
+        <li>Borodkin S. Ion-exchange resin delivery systems. In: Wise DL (ed.). <i>Handbook of Pharmaceutical Controlled Release Technology</i>. New York: Marcel Dekker; 2000.</li>
+        <li>Official FDA product labeling (DailyMed / fda.gov): Nicorette; Delsym; Tussionex.</li>
+        <li>Peer-reviewed literature indexed on PubMed / PubMed Central — used for cross-verification of book content.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="note rev d3" style="margin-top:16px">
+    Prepared for academic presentation. Product examples reflect official labeling; consult current prescribing information for clinical use.
+  </div>
+  <div class="foot"><span>Ion Exchange Drug Delivery</span><span>Summary · 14 / 14</span></div>
+</section>
+
+</div></div>
+
+<div id="nav">
+  <button id="prev" title="Previous slide (←)">←</button>
+  <span id="ctr">01 / 14</span>
+  <button id="next" title="Next slide (→)">→</button>
+</div>
+
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+let cur=0;
+const bar=document.getElementById('bar'),ctr=document.getElementById('ctr');
+function go(i){
+  if(i<0||i>=slides.length)return;
+  slides[cur].classList.remove('active');
+  cur=i;
+  slides[cur].classList.add('active');
+  bar.style.width=((cur+1)/slides.length*100)+'%';
+  ctr.textContent(String(cur+1).padStart(2,'0')+' / '+String(slides.length).padStart(2,'0'));
+}
+document.getElementById('next').onclick=()=>go(cur+1);
+document.getElementById('prev').onclick=()=>go(cur-1);
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();go(cur+1);}
+  else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(cur-1);}
+  else if(e.key==='Home'){go(0);}
+  else if(e.key==='End'){go(slides.length-1);}
+});
+function fit(){
+  const s=Math.min(window.innerWidth/1300,(window.innerHeight-76)/720);
+  document.getElementById('stage').style.transform='scale('+s+')';
+}
+window.addEventListener('resize',fit);fit();go(0);
+</script>
+</body>
+</html>
